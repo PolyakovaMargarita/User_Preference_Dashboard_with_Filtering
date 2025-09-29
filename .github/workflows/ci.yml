@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  client-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: client/package.json
+      - name: Install deps
+        run: npm ci || npm i
+      - name: Lint
+        run: npm run lint
+      - name: Prettier check
+        run: npm run format:check
+
+  server-tests:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: app
+          MYSQL_USER: app
+          MYSQL_PASSWORD: secret
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - "3306:3306"
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s --health-timeout=5s --health-retries=5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - "6379:6379"
+        options: >-
+          --health-cmd="redis-cli ping || exit 1"
+          --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, pdo_mysql, redis, xml, ctype, json, tokenizer
+      - name: Composer install and placeholder tests
+        shell: bash
+        run: |
+          if [ -f server/composer.json ]; then
+            cd server
+            composer install --no-interaction --prefer-dist --no-progress
+            echo "Добавить phpunit позже"
+          else
+            echo "server не инициализирован; пропускаю тесты"
+          fi
+
+  # server-tests:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Setup PHP
+  #       uses: shivammathur/setup-php@v2
+  #       with:
+  #         php-version: '8.3'
+  #         extensions: mbstring, pdo_mysql, xml, ctype, json, tokenizer
+  #     - name: Install Composer deps
+  #       run: |
+  #         cd server
+  #         composer install --no-interaction --prefer-dist --no-progress
+  #     - name: PHPUnit (скелет)
+  #       run: echo "Добавить phpunit позже"

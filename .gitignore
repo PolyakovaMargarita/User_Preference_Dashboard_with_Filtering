@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build
+client/dist/
+dist/
+
+# Env
+.env
+**/.env
+client/.env
+server/.env
+
+# PHP/Laravel
+vendor/
+server/vendor/
+storage/
+bootstrap/cache/
+
+# Misc
+.DS_Store
+.idea/
+.vscode/
+coverage/
+.vercel/
+
+

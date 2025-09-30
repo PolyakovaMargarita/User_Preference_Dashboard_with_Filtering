@@ -13,14 +13,14 @@ export const router = createBrowserRouter([
       {
         path: ROUTES.ADD_PRODUCT,
         async lazy() {
-          const { AddProductPage } = await import('../pages/AddProductPage')
+          const { AddProductPage } = await import('../pages/AddProductPage.tsx')
           return { Component: AddProductPage }
         },
       },
       {
         path: ROUTES.CATALOG,
         async lazy() {
-          const { CatalogPage } = await import('../pages/CatalogPage')
+          const { CatalogPage } = await import('../pages/CatalogPage.tsx')
           return { Component: CatalogPage }
         },
       },

@@ -4,9 +4,11 @@ import { ROUTES } from '../shared/constants/routes'
 export function Header() {
   return (
     <header className="border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-        <div className="text-lg font-semibold">User Preference Dashboard</div>
-        <nav className="flex items-center gap-2">
+      <div className="mx-auto max-w-6xl px-4 py-3 flex flex-wrap items-center gap-2 justify-center sm:justify-between">
+        <div className="text-lg font-semibold w-full text-center sm:w-auto sm:text-left">
+          User Preference Dashboard
+        </div>
+        <nav className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
           <NavLink
             to={ROUTES.ADD_PRODUCT}
             className={({ isActive }) =>

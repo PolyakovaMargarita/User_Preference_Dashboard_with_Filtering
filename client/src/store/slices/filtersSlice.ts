@@ -1,24 +1,40 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createSelector, type PayloadAction } from '@reduxjs/toolkit'
+import type { RootState } from '../../store'
 
 export type FiltersState = {
-  search: string
-  categoryId: string | null
+  q?: string
+  category?: string | number
+  min_price?: number
+  max_price?: number
+  min_rating?: number
+  show_only_favorites?: boolean
+  page: number
+  per_page: number
 }
 
 const initialState: FiltersState = {
-  search: '',
-  categoryId: null,
+  q: undefined,
+  category: undefined,
+  min_price: undefined,
+  max_price: undefined,
+  min_rating: undefined,
+  show_only_favorites: undefined,
+  page: 1,
+  per_page: 12,
 }
 
 const filtersSlice = createSlice({
   name: 'filters',
   initialState,
   reducers: {
-    setSearch(state, action: PayloadAction<string>) {
-      state.search = action.payload
+    setFilter(state, action: PayloadAction<Partial<FiltersState>>) {
+      Object.assign(state, action.payload)
     },
-    setCategoryId(state, action: PayloadAction<string | null>) {
-      state.categoryId = action.payload
+    setPage(state, action: PayloadAction<number>) {
+      state.page = action.payload
+    },
+    setPerPage(state, action: PayloadAction<number>) {
+      state.per_page = action.payload
     },
     resetFilters() {
       return initialState
@@ -26,5 +42,14 @@ const filtersSlice = createSlice({
   },
 })
 
-export const { setSearch, setCategoryId, resetFilters } = filtersSlice.actions
+export const { setFilter, setPage, setPerPage, resetFilters } = filtersSlice.actions
 export const filtersReducer = filtersSlice.reducer
+
+// Selectors
+const selectFiltersState = (state: RootState) => state.filters
+
+export const selectFilters = createSelector([selectFiltersState], (f) => f)
+export const selectPagination = createSelector([selectFiltersState], (f) => ({
+  page: f.page,
+  per_page: f.per_page,
+}))

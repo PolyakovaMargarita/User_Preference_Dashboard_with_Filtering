@@ -25,6 +25,7 @@ module.exports = {
   },
   rules: {
     'react/react-in-jsx-scope': 'off',
+    'react/prop-types': 'off',
     'prettier/prettier': [
       'error',
       { singleQuote: true, trailingComma: 'all', semi: false, printWidth: 100 },

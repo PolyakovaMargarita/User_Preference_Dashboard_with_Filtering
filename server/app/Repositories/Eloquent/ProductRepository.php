@@ -35,16 +35,24 @@ class ProductRepository implements ProductRepositoryInterface
         $searchValue = $filters['search'] ?? $filters['q'] ?? null;
         if (!empty($searchValue)) {
             $search = trim((string) $searchValue);
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', '%'.$search.'%')
-                  ->orWhere('description', 'like', '%'.$search.'%');
+            $terms = preg_split('/\s+/', $search, -1, PREG_SPLIT_NO_EMPTY);
+
+            $query->where(function ($q) use ($terms) {
+                foreach ($terms as $term) {
+                    $safe = str_replace(['%', '_'], ['\\%', '\\_'], $term);
+                    $q->orWhere('name', 'like', $safe.'%')
+                      ->orWhere('name', 'like', '% '.$safe.'%')
+                      ->orWhere('description', 'like', $safe.'%')
+                      ->orWhere('description', 'like', '% '.$safe.'%');
+                }
             });
         }
 
-        // Attach is_favorited flag and favorites_only filter
         $query->withExists(['favorites as is_favorited' => function ($q) use ($userId) {
             $q->where('user_id', $userId);
         }]);
+
+        // $query->orderByDesc('is_favorited');
 
         if (!empty($filters['favorites_only'])) {
             $favoritesOnly = filter_var($filters['favorites_only'], FILTER_VALIDATE_BOOLEAN);
@@ -55,7 +63,6 @@ class ProductRepository implements ProductRepositoryInterface
             }
         }
 
-        // Sorting
         $sort = (string) ($filters['sort'] ?? '');
         switch ($sort) {
             case 'price_asc':

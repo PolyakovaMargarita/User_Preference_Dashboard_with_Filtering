@@ -1,8 +1,139 @@
+import { useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '@/store'
+import { setFilter, selectFilters, setPage, setPerPage } from '@/store/slices/filtersSlice'
+import { useGetProductsQuery } from '@/store/api/productsApi.ts'
+import { ProductCard } from '@/features/products/components/ProductCard'
+import { SkeletonCard } from '@/features/products/components/SkeletonCard'
+import { Pagination } from '@/features/products/components/Pagination'
+import { FilterPanel } from '@/features/products/components/FilterPanel'
+import { FiltersForm } from '@/features/products/forms/FiltersForm'
+import type { Filters } from '@/features/products/schemas'
+import { useToggleFavoriteMutation } from '@/features/products/services'
+
 export function CatalogPage() {
+  const dispatch = useAppDispatch()
+  const filters = useAppSelector(selectFilters)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const { data, currentData, isLoading, isFetching } = useGetProductsQuery(filters)
+  const [toggleFavorite] = useToggleFavoriteMutation()
+  const isInitialLoading = isLoading || (isFetching && !currentData)
+
+  const items = (currentData ?? data)?.items
+
+  // init from URL once
+  useEffect(() => {
+    const params: Record<string, unknown> = {}
+    const q = searchParams.get('q') || undefined
+    const page = Number(searchParams.get('page') || '1')
+    const per_page = Number(searchParams.get('per_page') || '12')
+    const category = searchParams.get('category') || undefined
+    const min_price = searchParams.get('min_price')
+    const max_price = searchParams.get('max_price')
+    const min_rating = searchParams.get('min_rating')
+    const favorites = searchParams.get('favorites_only')
+
+    if (q) params.q = q
+    if (category) params.category = isNaN(Number(category)) ? category : Number(category)
+    if (min_price) params.min_price = Number(min_price)
+    if (max_price) params.max_price = Number(max_price)
+    if (min_rating) params.min_rating = Number(min_rating)
+    if (favorites != null) params.show_only_favorites = favorites === 'true'
+    params.page = page
+    params.per_page = per_page
+
+    dispatch(setFilter(params))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // sync URL on filters change
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (filters.q) params.set('q', String(filters.q))
+    if (filters.category != null) params.set('category', String(filters.category))
+    if (filters.min_price != null) params.set('min_price', String(filters.min_price))
+    if (filters.max_price != null) params.set('max_price', String(filters.max_price))
+    if (filters.min_rating != null) params.set('min_rating', String(filters.min_rating))
+    if (filters.show_only_favorites != null)
+      params.set('favorites_only', String(Boolean(filters.show_only_favorites)))
+    params.set('page', String(filters.page))
+    params.set('per_page', String(filters.per_page))
+
+    setSearchParams(params, { replace: true })
+  }, [filters, setSearchParams])
+
   return (
     <section className="p-6">
       <h1 className="text-2xl font-semibold">Catalog</h1>
-      <p className="text-muted-foreground mt-2">Placeholder for products list.</p>
+      <FiltersForm
+        initialValues={{
+          q: filters.q,
+          category: filters.category,
+          min_price: filters.min_price,
+          max_price: filters.max_price,
+          min_rating: filters.min_rating,
+          show_favorites: filters.show_only_favorites,
+        }}
+        onSubmit={(values: Filters) => {
+          const mapped = {
+            q: values.q || undefined,
+            category: values.category
+              ? isNaN(Number(values.category))
+                ? values.category
+                : Number(values.category)
+              : undefined,
+            min_price: values.min_price,
+            max_price: values.max_price,
+            min_rating: values.min_rating,
+            show_only_favorites: values.show_favorites,
+            page: 1,
+          }
+          dispatch(setFilter(mapped))
+        }}
+      />
+      <div
+        className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        aria-busy={isLoading || isFetching}
+      >
+        {isInitialLoading &&
+          Array.from({ length: filters.per_page }).map((_, i) => <SkeletonCard key={i} />)}
+        {!isInitialLoading &&
+          items?.map((p) => (
+            <ProductCard
+              key={p.id}
+              product={{
+                id: p.id,
+                name: p.name,
+                description: p.description,
+                category: p.category
+                  ? { id: p.category.id, name: p.category.name, slug: p.category.slug }
+                  : undefined,
+                category_id: p.category_id,
+                price: p.price,
+                rating: p.rating,
+                is_favorite: p.is_favorite ?? p.is_favorited,
+                created_at: p.created_at,
+                updated_at: p.updated_at,
+              }}
+              onToggleFavorite={async (id, isFavorite) => {
+                try {
+                  await toggleFavorite({ id, isFavorite, listArg: filters }).unwrap()
+                } catch (e) {
+                  // no-op toast here if needed
+                }
+              }}
+            />
+          ))}
+      </div>
+      {(currentData ?? data)?.meta && (
+        <Pagination
+          meta={(currentData ?? data)!.meta}
+          currentPage={filters.page}
+          selectedPerPage={filters.per_page}
+          onChangePage={(page) => dispatch(setPage(page))}
+          onChangePerPage={(pp) => dispatch(setPerPage(pp))}
+        />
+      )}
     </section>
   )
 }

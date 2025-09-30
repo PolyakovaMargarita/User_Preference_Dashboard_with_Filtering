@@ -1,7 +1,5 @@
 import { AddProductForm } from '@/features/products/forms/AddProductForm'
-
 export function AddProductPage() {
-
   return (
     <section className="p-6">
       <h1 className="text-2xl font-semibold">Add Product</h1>

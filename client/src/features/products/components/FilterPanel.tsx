@@ -21,7 +21,8 @@ export function FilterPanel() {
     if (debounced !== (filters.q ?? '')) {
       dispatch(setFilter({ q: debounced || undefined, page: 1 }))
     }
-  }, [debounced, dispatch])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debounced])
 
   return (
     <div className="mt-4 sm:mt-6 grid grid-cols-1 gap-2 rounded-lg border p-3 text-sm sm:gap-4 sm:p-4 md:grid-cols-4">

@@ -28,7 +28,6 @@ export function FiltersForm({
 
   const {
     control,
-    register,
     handleSubmit,
     formState: { errors },
     reset,

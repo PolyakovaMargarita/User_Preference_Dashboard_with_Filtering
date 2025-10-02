@@ -1,157 +1,195 @@
 {
     "info": {
-      "name": "User Preference Dashboard API",
-      "_postman_id": "3e8f8b2d-0b4c-4d1a-bb65-collection",
-      "description": "Коллекция для тестирования API продуктов, категорий и избранного",
-      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        "name": "User Preference Dashboard API",
+        "_postman_id": "3e8f8b2d-0b4c-4d1a-bb65-collection",
+        "description": "Collection for testing API: products, categories and favorites",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [
-      { "key": "base_url", "value": "http://localhost", "type": "string" },
-      { "key": "product_id", "value": "1", "type": "string" }
+        { "key": "base_url", "value": "http://localhost", "type": "string" },
+        { "key": "product_id", "value": "1", "type": "string" }
     ],
     "item": [
-      {
-        "name": "Categories",
-        "item": [
-          {
-            "name": "GET /api/categories",
-            "request": {
-              "method": "GET",
-              "header": [
-                { "key": "Accept", "value": "application/json" }
-              ],
-              "url": {
-                "raw": "{{base_url}}/api/categories",
-                "host": ["{{base_url}}"],
-                "path": ["api", "categories"]
-              }
-            }
-          }
-        ]
-      },
-      {
-        "name": "Products",
-        "item": [
-          {
-            "name": "GET /api/products (list with filters & pagination)",
-            "request": {
-              "method": "GET",
-              "header": [
-                { "key": "Accept", "value": "application/json" }
-              ],
-              "url": {
-                "raw": "{{base_url}}/api/products?per_page=12&page=1&category=1&min_price=50&max_price=2000&min_rating=4&q=iphone&favorites_only=false&sort=price_desc",
-                "host": ["{{base_url}}"],
-                "path": ["api", "products"],
-                "query": [
-                  { "key": "per_page", "value": "12" },
-                  { "key": "page", "value": "1" },
-                  { "key": "category", "value": "1" },
-                  { "key": "min_price", "value": "50" },
-                  { "key": "max_price", "value": "2000" },
-                  { "key": "min_rating", "value": "4" },
-                  { "key": "q", "value": "iphone" },
-                  { "key": "favorites_only", "value": "false" },
-                  { "key": "sort", "value": "price_desc" }
-                ]
-              }
-            }
-          },
-          {
-            "name": "GET /api/products/{id}",
-            "request": {
-              "method": "GET",
-              "header": [
-                { "key": "Accept", "value": "application/json" }
-              ],
-              "url": {
-                "raw": "{{base_url}}/api/products/{{product_id}}",
-                "host": ["{{base_url}}"],
-                "path": ["api", "products", "{{product_id}}"]
-              }
-            }
-          },
-          {
-            "name": "POST /api/products (create)",
-            "request": {
-              "method": "POST",
-              "header": [
-                { "key": "Accept", "value": "application/json" },
-                { "key": "Content-Type", "value": "application/json" }
-              ],
-              "body": {
-                "mode": "raw",
-                "raw": "{\n  \"category_id\": 1,\n  \"name\": \"New Product\",\n  \"description\": \"Description text\",\n  \"price\": 199.99,\n  \"rating\": 4.5\n}"
-              },
-              "url": {
-                "raw": "{{base_url}}/api/products",
-                "host": ["{{base_url}}"],
-                "path": ["api", "products"]
-              }
-            }
-          },
-          {
-            "name": "PUT /api/products/{id} (update)",
-            "request": {
-              "method": "PUT",
-              "header": [
-                { "key": "Accept", "value": "application/json" },
-                { "key": "Content-Type", "value": "application/json" }
-              ],
-              "body": {
-                "mode": "raw",
-                "raw": "{\n  \"category_id\": 1,\n  \"name\": \"Updated Product\",\n  \"description\": \"Updated description\",\n  \"price\": 249.99,\n  \"rating\": 4.8\n}"
-              },
-              "url": {
-                "raw": "{{base_url}}/api/products/{{product_id}}",
-                "host": ["{{base_url}}"],
-                "path": ["api", "products", "{{product_id}}"]
-              }
-            }
-          },
-          {
-            "name": "DELETE /api/products/{id} (delete)",
-            "request": {
-              "method": "DELETE",
-              "header": [
-                { "key": "Accept", "value": "application/json" }
-              ],
-              "url": {
-                "raw": "{{base_url}}/api/products/{{product_id}}",
-                "host": ["{{base_url}}"],
-                "path": ["api", "products", "{{product_id}}"]
-              }
-            }
-          },
-          {
-            "name": "POST /api/products/{id}/favorite",
-            "request": {
-              "method": "POST",
-              "header": [
-                { "key": "Accept", "value": "application/json" }
-              ],
-              "url": {
-                "raw": "{{base_url}}/api/products/{{product_id}}/favorite",
-                "host": ["{{base_url}}"],
-                "path": ["api", "products", "{{product_id}}", "favorite"]
-              }
-            }
-          },
-          {
-            "name": "DELETE /api/products/{id}/favorite",
-            "request": {
-              "method": "DELETE",
-              "header": [
-                { "key": "Accept", "value": "application/json" }
-              ],
-              "url": {
-                "raw": "{{base_url}}/api/products/{{product_id}}/favorite",
-                "host": ["{{base_url}}"],
-                "path": ["api", "products", "{{product_id}}", "favorite"]
-              }
-            }
-          }
-        ]
-      }
+        {
+            "name": "Categories",
+            "item": [
+                {
+                    "name": "GET /api/categories",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/categories",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "categories"]
+                        }
+                    }
+                },
+                {
+                    "name": "POST /api/categories (create)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": New categories\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/categories",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "categories"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Products",
+            "item": [
+                {
+                    "name": "GET /api/products (list with filters & pagination)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/products?per_page=12&page=1&category=1&min_price=50&max_price=2000&min_rating=4&q=iphone&favorites_only=false&sort=price_desc",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products"],
+                            "query": [
+                                { "key": "per_page", "value": "12" },
+                                { "key": "page", "value": "1" },
+                                { "key": "category", "value": "1" },
+                                { "key": "min_price", "value": "50" },
+                                { "key": "max_price", "value": "2000" },
+                                { "key": "min_rating", "value": "4" },
+                                { "key": "q", "value": "iphone" },
+                                { "key": "favorites_only", "value": "false" },
+                                { "key": "sort", "value": "price_desc" }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "GET /api/products/{id}",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/products/{{product_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products", "{{product_id}}"]
+                        }
+                    }
+                },
+                {
+                    "name": "POST /api/products (create)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"category_id\": 1,\n  \"name\": \"New Product\",\n  \"description\": \"Description text\",\n  \"price\": 199.99,\n  \"rating\": 4.5\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/products",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products"]
+                        }
+                    }
+                },
+                {
+                    "name": "PUT /api/products/{id} (update)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"category_id\": 1,\n  \"name\": \"Updated Product\",\n  \"description\": \"Updated description\",\n  \"price\": 249.99,\n  \"rating\": 4.8\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/products/{{product_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products", "{{product_id}}"]
+                        }
+                    }
+                },
+                {
+                    "name": "DELETE /api/products/{id} (delete)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/products/{{product_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products", "{{product_id}}"]
+                        }
+                    }
+                },
+                {
+                    "name": "POST /api/products/{id}/favorite",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/products/{{product_id}}/favorite",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "api",
+                                "products",
+                                "{{product_id}}",
+                                "favorite"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "DELETE /api/products/{id}/favorite",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/products/{{product_id}}/favorite",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "api",
+                                "products",
+                                "{{product_id}}",
+                                "favorite"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
     ]
-  }
+}

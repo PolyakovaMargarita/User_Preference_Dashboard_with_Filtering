@@ -1,8 +1,8 @@
-### Архитектура проекта
+### Project architecture
 
-- Используется упрощённый feature-based подход:
-  - `features/products` содержит всё для работы с каталогом (страницы, компоненты, Redux).
-  - `shared` хранит переиспользуемые хуки, утилиты и UI.
-  - `layouts` нужны для расширяемости (например, если появится авторизация).
+- Simplified feature-based approach:
+  - `features/products` contains everything for the catalog (pages, components, Redux).
+  - `shared` stores reusable hooks, utilities and UI.
+  - `layouts` prepared for extensibility (e.g. auth).
 
-Такой подход выбран, чтобы код было легко масштабировать в будущем, но структура при этом остаётся максимально простой для чтения.
+This approach keeps code easy to scale while staying simple to read.

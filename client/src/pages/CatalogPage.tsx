@@ -1,7 +1,8 @@
 import { useCallback, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/store'
-import { setFilter, selectFilters } from '@/store/slices/filtersSlice'
+import { setFilter } from '@/store/slices/filtersSlice'
+import { selectFilters } from '@/store/selections'
 import { FiltersForm } from '@/features/products/forms/FiltersForm'
 import type { Filters } from '@/features/products/schemas'
 import { ProductListBlock } from '@/features/products/blocks/ProductListBlock'
@@ -75,7 +76,7 @@ export function CatalogPage() {
 
   useEffect(() => {
     updateUrlFromFilters()
-  }, [filters, setSearchParams, updateUrlFromFilters])
+  }, [updateUrlFromFilters])
 
   return (
     <section className="p-6">

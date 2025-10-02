@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { useAppDispatch, useAppSelector } from '@/store'
-import { selectFilters, setPage, setPerPage } from '@/store/slices/filtersSlice'
+import { setPage, setPerPage } from '@/store/slices/filtersSlice'
+import { selectFilters } from '@/store/selections'
 import { useGetProductsQuery } from '@/store/api/productsApi.ts'
 import { useToggleFavoriteMutation } from '@/features/products/services'
 import { useToast } from '@/components/ui/use-toast.tsx'

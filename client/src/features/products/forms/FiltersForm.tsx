@@ -8,7 +8,7 @@ import { FilterCategorySelect } from '@/features/products/components/FilterCateg
 import { FilterPriceSlider } from '@/features/products/components/FilterPriceSlider'
 import { FilterRatingSlider } from '@/features/products/components/FilterRatingSlider'
 import { FilterFavoritesToggle } from '@/features/products/components/FilterFavoritesToggle'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 
 export function FiltersForm({
@@ -65,8 +65,16 @@ export function FiltersForm({
     1000,
   )
 
+  const prevFiltersRef = useRef(debouncedFilters)
+
   useEffect(() => {
-    handleSubmit(submit)()
+    const hasFilterChanges =
+      JSON.stringify(prevFiltersRef.current) !== JSON.stringify(debouncedFilters)
+
+    if (hasFilterChanges) {
+      prevFiltersRef.current = debouncedFilters
+      handleSubmit(submit)()
+    }
   }, [debouncedFilters, handleSubmit, submit])
 
   const clear = useCallback(() => {

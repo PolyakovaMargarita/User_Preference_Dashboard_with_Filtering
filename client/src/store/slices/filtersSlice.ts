@@ -1,5 +1,4 @@
-import { createSlice, createSelector, type PayloadAction } from '@reduxjs/toolkit'
-import type { RootState } from '../../store'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 export type FiltersState = {
   q?: string
@@ -44,12 +43,3 @@ const filtersSlice = createSlice({
 
 export const { setFilter, setPage, setPerPage, resetFilters } = filtersSlice.actions
 export const filtersReducer = filtersSlice.reducer
-
-// Selectors
-const selectFiltersState = (state: RootState) => state.filters
-
-export const selectFilters = createSelector([selectFiltersState], (f) => f)
-export const selectPagination = createSelector([selectFiltersState], (f) => ({
-  page: f.page,
-  per_page: f.per_page,
-}))

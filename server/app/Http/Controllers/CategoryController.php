@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CategoryResource;
 use App\Services\CategoryService;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreCategoryRequest;
 
 class CategoryController extends Controller
 {
@@ -22,9 +23,11 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCategoryRequest $request)
     {
-        //
+        $validated = $request->validated();
+        $category = $this->service->createCategory($validated['name']);
+        return new CategoryResource($category);
     }
 
     /**

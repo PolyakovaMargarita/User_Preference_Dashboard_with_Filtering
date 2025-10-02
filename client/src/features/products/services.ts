@@ -6,7 +6,7 @@ import type {
   GetProductsParams,
   CreateProductRequest,
   PaginationMeta,
-} from '@/api/types/contracts'
+} from '@/shared/types/contracts'
 
 export const productsServices = baseApi.injectEndpoints({
   endpoints: (build) => ({

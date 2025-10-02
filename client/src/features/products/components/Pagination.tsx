@@ -1,4 +1,4 @@
-import type { PaginationMeta } from '@/api/types/contracts'
+import type { PaginationMeta } from '@/shared/types/contracts'
 import {
   Pagination as ShadPagination,
   PaginationContent,
@@ -15,30 +15,38 @@ type Props = {
   selectedPerPage?: number
 }
 
-export function Pagination({
+import { memo, useCallback } from 'react'
+
+export const Pagination = memo(function Pagination({
   meta,
   onChangePage,
   onChangePerPage,
   currentPage,
   selectedPerPage,
 }: Props) {
-  const current = (currentPage ?? Number(meta.current_page)) || 1
-  const last = Number(meta.last_page) || 1
-  const perPage = (selectedPerPage ?? Number(meta.per_page)) || 12
+  const current = currentPage ?? meta.current_page ?? 1
+  const last = meta.last_page ?? 1
+  const perPage = selectedPerPage ?? meta.per_page ?? 12
 
   const isPrevDisabled = current <= 1
   const isNextDisabled = current >= last
 
-  const prev: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
-    e.preventDefault()
-    if (isPrevDisabled) return
-    onChangePage(Math.max(1, current - 1))
-  }
-  const next: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
-    e.preventDefault()
-    if (isNextDisabled) return
-    onChangePage(Math.min(last, current + 1))
-  }
+  const prev: React.MouseEventHandler<HTMLAnchorElement> = useCallback(
+    (e) => {
+      e.preventDefault()
+      if (isPrevDisabled) return
+      onChangePage(Math.max(1, current - 1))
+    },
+    [isPrevDisabled, onChangePage, current],
+  )
+  const next: React.MouseEventHandler<HTMLAnchorElement> = useCallback(
+    (e) => {
+      e.preventDefault()
+      if (isNextDisabled) return
+      onChangePage(Math.min(last, current + 1))
+    },
+    [isNextDisabled, onChangePage, last, current],
+  )
 
   return (
     <div className="mt-4 flex flex-wrap items-center gap-3 justify-center sm:justify-between text-center sm:text-left">
@@ -91,4 +99,4 @@ export function Pagination({
       </div>
     </div>
   )
-}
+})

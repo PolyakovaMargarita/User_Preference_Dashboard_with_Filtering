@@ -11,7 +11,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: unknown, info: ErrorInfo) {
-    // Можно подключить логирование
     console.error('ErrorBoundary caught:', error, info)
   }
 

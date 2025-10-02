@@ -2,19 +2,13 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FiltersSchema, type Filters } from '../schemas'
 import { useGetCategoriesQuery } from '@/store/api/categoriesApi.ts'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Slider } from '@/components/ui/slider'
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/select'
-import { useEffect, useState } from 'react'
+import { FilterSearchField } from '@/features/products/components/FilterSearchField'
+import { FilterCategorySelect } from '@/features/products/components/FilterCategorySelect'
+import { FilterPriceSlider } from '@/features/products/components/FilterPriceSlider'
+import { FilterRatingSlider } from '@/features/products/components/FilterRatingSlider'
+import { FilterFavoritesToggle } from '@/features/products/components/FilterFavoritesToggle'
+import { useCallback, useEffect, useState } from 'react'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 
 export function FiltersForm({
@@ -24,7 +18,11 @@ export function FiltersForm({
   onSubmit: (values: Filters) => void
   initialValues?: Partial<Filters>
 }) {
-  const { data: categories } = useGetCategoriesQuery()
+  const {
+    data: categories,
+    isLoading: isCatsLoading,
+    isError: isCatsError,
+  } = useGetCategoriesQuery()
 
   const {
     control,
@@ -35,11 +33,13 @@ export function FiltersForm({
     setValue,
   } = useForm<Filters>({ resolver: zodResolver(FiltersSchema), defaultValues: initialValues })
 
-  const submit = (values: Filters) => {
-    onSubmit(values)
-  }
+  const submit = useCallback(
+    (values: Filters) => {
+      onSubmit(values)
+    },
+    [onSubmit],
+  )
 
-  // Debounced search state
   const [localSearch, setLocalSearch] = useState<string>(initialValues?.q ?? '')
   const debouncedQ = useDebounce(localSearch, 400)
 
@@ -51,7 +51,25 @@ export function FiltersForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedQ])
 
-  const clear = () => {
+  const [watchedCategory, watchedMinPrice, watchedMaxPrice, watchedMinRating, watchedFavorites] =
+    watch(['category', 'min_price', 'max_price', 'min_rating', 'show_favorites'])
+
+  const debouncedFilters = useDebounce(
+    {
+      category: watchedCategory,
+      min_price: watchedMinPrice,
+      max_price: watchedMaxPrice,
+      min_rating: watchedMinRating,
+      show_favorites: watchedFavorites,
+    },
+    1000,
+  )
+
+  useEffect(() => {
+    handleSubmit(submit)()
+  }, [debouncedFilters, handleSubmit, submit])
+
+  const clear = useCallback(() => {
     reset({
       q: undefined,
       category: undefined,
@@ -60,99 +78,67 @@ export function FiltersForm({
       min_rating: undefined,
       show_favorites: undefined,
     })
+    setValue('category', undefined, { shouldDirty: true })
     setLocalSearch('')
     handleSubmit(submit)()
-  }
+  }, [handleSubmit, reset, submit, setValue])
 
   return (
     <form
       onSubmit={handleSubmit(submit)}
       className="grid grid-cols-1 gap-4 rounded-lg border p-4 md:grid-cols-3"
     >
-      <div>
-        <Label htmlFor="q">Search</Label>
-        <Input id="q" value={localSearch} onChange={(e) => setLocalSearch(e.target.value)} />
-        {errors.q && <p className="text-sm text-red-600 mt-1">{errors.q.message as string}</p>}
-      </div>
+      <FilterSearchField
+        value={localSearch}
+        onChange={setLocalSearch}
+        error={errors.q?.message as string | undefined}
+      />
       <Controller
         control={control}
         name="category"
         render={({ field }) => (
-          <div>
-            <Label htmlFor="category">Category</Label>
-            <Select
-              value={field.value == null ? 'all' : String(field.value)}
-              onValueChange={(val) => {
-                if (val === 'all') return field.onChange(undefined)
-                const num = Number(val)
-                return field.onChange(Number.isNaN(num) ? val : num)
-              }}
-            >
-              <SelectTrigger id="category">
-                <SelectValue placeholder="All" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                {categories?.map((c) => (
-                  <SelectItem key={c.id} value={String(c.id)}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <FilterCategorySelect
+            value={field.value}
+            onChange={(v) => field.onChange(v)}
+            categories={categories}
+            isLoading={isCatsLoading}
+            isError={isCatsError}
+          />
         )}
       />
-      <div className="space-y-2 md:col-span-2">
-        <Label>Price</Label>
-        <Slider
-          min={0}
-          max={5000}
-          step={10}
-          value={[watch('min_price') ?? 0, watch('max_price') ?? 5000]}
-          onValueChange={([min, max]) => {
-            setValue('min_price', min, { shouldDirty: true })
-            setValue('max_price', max, { shouldDirty: true })
-          }}
-        />
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>${String(watch('min_price') ?? 0)}</span>
-          <span>${String(watch('max_price') ?? 5000)}</span>
-        </div>
-        {(errors.min_price || errors.max_price) && (
-          <p className="text-sm text-red-600 mt-1">
-            {(errors.min_price?.message as string) || (errors.max_price?.message as string)}
-          </p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label>Min rating</Label>
-        <Slider
-          min={0}
-          max={5}
-          step={1}
-          value={[watch('min_rating') ?? 0]}
-          onValueChange={([min]) => setValue('min_rating', min, { shouldDirty: true })}
-        />
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{String(watch('min_rating') ?? 0)}+</span>
-          <span>5</span>
-        </div>
-      </div>
-      <div className="flex items-end gap-2">
-        <label className="inline-flex items-center gap-2 text-sm">
-          <Checkbox
+      <FilterPriceSlider
+        min={0}
+        max={5000}
+        minValue={watch('min_price') ?? 0}
+        maxValue={watch('max_price') ?? 5000}
+        onChange={(min, max) => {
+          setValue('min_price', min, { shouldDirty: true })
+          setValue('max_price', max, { shouldDirty: true })
+        }}
+      />
+      {(errors.min_price || errors.max_price) && (
+        <p className="text-sm text-red-600 mt-1 md:col-span-2">
+          {(errors.min_price?.message as string) || (errors.max_price?.message as string)}
+        </p>
+      )}
+      <FilterRatingSlider
+        min={0}
+        max={5}
+        value={watch('min_rating') ?? 0}
+        onChange={(min) => setValue('min_rating', min, { shouldDirty: true })}
+      />
+      <div className="md:col-span-3 flex gap-2 items-center">
+        <div className="">
+          <FilterFavoritesToggle
             checked={!!watch('show_favorites')}
-            onCheckedChange={(v) => setValue('show_favorites', Boolean(v))}
+            onChange={(v) => setValue('show_favorites', Boolean(v))}
           />
-          Favorites only
-        </label>
-      </div>
-      <div className="md:col-span-3 flex gap-2">
-        <Button type="submit">Apply</Button>
-        <Button type="button" onClick={clear} variant="outline">
-          Reset
-        </Button>
+        </div>
+        <div className="flex ml-auto">
+          <Button type="button" onClick={clear} variant="outline">
+            Reset
+          </Button>
+        </div>
       </div>
     </form>
   )

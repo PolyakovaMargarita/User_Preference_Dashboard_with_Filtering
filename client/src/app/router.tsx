@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { ROUTES } from '../shared/constants/routes'
 import { DefaultLayout } from '../layouts/DefaultLayout'
 import { RouteError } from '../shared/ui/RouteError'
+import { NotFoundPage } from '../pages/NotFoundPage'
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
           return { Component: CatalogPage }
         },
       },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])

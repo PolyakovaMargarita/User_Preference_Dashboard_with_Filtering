@@ -7,5 +7,6 @@ export const Endpoints = {
   },
   categories: {
     list: '/categories',
+    create: '/categories',
   },
 } as const

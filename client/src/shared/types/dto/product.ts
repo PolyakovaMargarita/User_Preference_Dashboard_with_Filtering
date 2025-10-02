@@ -1,4 +1,4 @@
-import type { CategoryDto } from './category'
+import type { CategoryDto } from './category.ts'
 
 export interface ProductDto {
   id: number
@@ -8,7 +8,6 @@ export interface ProductDto {
   category?: CategoryDto
   price: number
   rating: number
-  // Backend returns is_favorited; keep both for compatibility
   is_favorite?: boolean
   is_favorited?: boolean
   created_at?: string

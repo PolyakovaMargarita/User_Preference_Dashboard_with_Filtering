@@ -6,12 +6,6 @@ node_modules/
 client/dist/
 dist/
 
-# Env
-.env
-**/.env
-client/.env
-server/.env
-
 # PHP/Laravel
 vendor/
 server/vendor/

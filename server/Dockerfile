@@ -1,6 +1,6 @@
 FROM php:8.3-fpm
 
-# Установка системных зависимостей
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
     libpng-dev \
@@ -10,28 +10,34 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip
 
-# Очистка кэша
+# Clean up cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Установка PHP расширений
+# Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Установка Composer
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Установка рабочей директории
+# Set working directory
 WORKDIR /var/www
 
-# Копирование всех файлов проекта
+# Copy all project files
 COPY . .
 
-# Установка зависимостей PHP
+# Create necessary directories for Laravel and set permissions
+RUN mkdir -p storage bootstrap/cache \
+    && chmod -R 777 storage bootstrap/cache
+
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Установка прав доступа
+# Set directory permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 777 /var/www/storage /var/www/bootstrap/cache
 
+# Expose PHP-FPM port
 EXPOSE 9000
 
+# Start PHP-FPM
 CMD ["php-fpm"]

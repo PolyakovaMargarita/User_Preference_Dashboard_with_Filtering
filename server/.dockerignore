@@ -17,10 +17,8 @@ storage/framework/cache/*
 storage/framework/sessions/*
 storage/framework/views/*
 storage/app/public/*
-Dockerfile*
-docker-compose*.yml
+compose.yml
 .dockerignore
-docker/
 docker-start.sh
 docker-start.ps1
 docker-debug.sh
